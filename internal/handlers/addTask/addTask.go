@@ -9,22 +9,25 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
 	Tasks        []*Task
-	nextTaskID   = 1
-	TaskChannel  = make(chan *Task, 100)
-	mySigningKey = []byte("yandexL")
+	nextTaskID   int64 = 1
+	TaskChannel        = make(chan *Task, 100)
+	mySigningKey       = []byte("yandexL")
 )
 
 type Task struct {
-	ID         int        `json:"id"`
+	ID         int64      `json:"id"`
 	Expression string     `json:"expression"`
 	Status     string     `json:"status"`
 	Result     float64    `json:"result,omitempty"`
 	AgentID    int        `json:"agent_id,omitempty"`
 	Duration   float64    `json:"duration(seconds),omitempty"`
+	StartDate  time.Time  `json:"start_date"`
+	EndDate    time.Time  `json:"end_date,omitempty"`
 	Mutex      sync.Mutex `json:"-"`
 }
 
@@ -39,13 +42,7 @@ func AddTask(taskSaver TaskSaver) http.HandlerFunc {
 			http.Error(w, "Failed to decode JSON", http.StatusBadRequest)
 			return
 		}
-		defer r.Body.Close()
 		// Добавляем задачу в список
-		task.ID = nextTaskID
-		nextTaskID++
-		task.Status = "queued"
-		task.Mutex = sync.Mutex{}
-		Tasks = append(Tasks, &task)
 
 		userID, err := getUserID(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer "))
 
@@ -55,11 +52,9 @@ func AddTask(taskSaver TaskSaver) http.HandlerFunc {
 			return
 		}
 
-		_, err = taskSaver.SaveTask(userID, task.Expression)
+		id, err := taskSaver.SaveTask(userID, task.Expression)
 
-		TaskChannel <- &task
-
-		json.NewEncoder(w).Encode(map[string]int{"task_id": task.ID})
+		json.NewEncoder(w).Encode(map[string]int64{"task_id": id})
 	}
 }
 

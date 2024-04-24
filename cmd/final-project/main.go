@@ -23,8 +23,7 @@ func main() {
 		log.Fatal("failed to init storage: %w", err)
 	}
 
-	_ = storage
-	go agent.StartAgents(3)
+	go agent.StartAgents(3, storage)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/register", register.NewUser(storage)).Methods("POST")
@@ -32,7 +31,7 @@ func main() {
 
 	router.Handle("/tasks/add", auth.IsAuthorized(addTask.AddTask(storage))).Methods("POST")
 	router.Handle("/tasks", auth.IsAuthorized(listTasks.ListTasks)).Methods("GET")
-	router.Handle("/tasks/{id}/result", auth.IsAuthorized(getResult.GetTaskResult)).Methods("GET")
+	router.Handle("/tasks/{id}/result", auth.IsAuthorized(getResult.GetTaskResult(storage))).Methods("GET")
 	router.Handle("/operations", auth.IsAuthorized(getOperation.GetOperations)).Methods("GET")
 
 	log.Println("Server started on :8080")

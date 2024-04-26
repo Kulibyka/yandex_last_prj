@@ -14,9 +14,7 @@ import (
 
 var (
 	Tasks        []*Task
-	nextTaskID   int64 = 1
-	TaskChannel        = make(chan *Task, 100)
-	mySigningKey       = []byte("yandexL")
+	mySigningKey = []byte("yandexL")
 )
 
 type Task struct {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"gRPC_service/internal/handlers/addTask"
+	"math"
 	"time"
 )
 
@@ -168,10 +169,19 @@ func (s *Storage) GetResult(taskID int) (*addTask.Task, error) {
 	const op = "storage.sqlite.GetResult"
 	var task addTask.Task
 
-	err := s.db.QueryRow("SELECT Status, Res FROM Tasks WHERE ID = ?",
-		taskID).Scan(&task.Status, &task.Result)
+	var res sql.NullFloat64
+	err := s.db.QueryRow("SELECT Status, Res FROM Tasks WHERE ID = ?", taskID).Scan(&task.Status, &res)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("%s: task not found", op)
+		}
 		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if res.Valid {
+		task.Result = res.Float64
+	} else {
+		task.Result = math.NaN()
 	}
 
 	return &task, nil

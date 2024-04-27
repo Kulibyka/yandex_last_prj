@@ -28,6 +28,8 @@ tg: @Vzyhovich
 
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/41bcfa35-72f8-4999-9e20-6e4fe9c761cb)
 
+![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/cc248491-e812-49bb-8937-9108aedc5569)
+
 Хэндлер "/tasks": выводит список поставленных задач с их статусами, кроме токена ничего не нужно отправлять.
 
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/3acbd0dc-c1eb-4142-934c-28693ed78d7e)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"gRPC_service/internal/handlers/addTask"
 	"net/http"
 	"strconv"
@@ -29,6 +30,7 @@ func GetTaskResult(resultGetter ResultGetter) http.HandlerFunc {
 				http.Error(w, "Task not found", http.StatusNotFound)
 				return
 			}
+			fmt.Println(err)
 			http.Error(w, "Failed to fetch task details", http.StatusInternalServerError)
 			return
 		}

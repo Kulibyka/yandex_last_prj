@@ -25,7 +25,7 @@ func StartAgents(numAgents int, dbChanger DbChanger) {
 				// Проверяем, есть ли задача
 				if task == nil {
 					// Если задачи нет, ждем некоторое время перед повторной попыткой
-					time.Sleep(2 * time.Second)
+					time.Sleep(5 * time.Second)
 					continue
 				}
 

@@ -19,6 +19,7 @@ var (
 
 type Task struct {
 	ID         int64      `json:"id"`
+	UserID     int64      `json:"user_id"`
 	Expression string     `json:"expression"`
 	Status     string     `json:"status"`
 	Result     float64    `json:"result,omitempty"`

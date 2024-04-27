@@ -13,10 +13,10 @@ type Operation struct {
 
 var (
 	Operations = []Operation{
-		{"Сложение", 20 * time.Second},
-		{"Вычитание", 30 * time.Second},
-		{"Умножение", 25 * time.Second},
-		{"Деление", 50 * time.Second},
+		{"Сложение", 2 * time.Second},
+		{"Вычитание", 3 * time.Second},
+		{"Умножение", 2 * time.Second},
+		{"Деление", 5 * time.Second},
 	}
 )
 

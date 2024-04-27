@@ -30,7 +30,7 @@ func main() {
 	router.HandleFunc("/login", login.Login(storage)).Methods("POST")
 
 	router.Handle("/tasks/add", auth.IsAuthorized(addTask.AddTask(storage))).Methods("POST")
-	router.Handle("/tasks", auth.IsAuthorized(listTasks.ListTasks)).Methods("GET")
+	router.Handle("/tasks", auth.IsAuthorized(listTasks.ListTasks(storage))).Methods("GET")
 	router.Handle("/tasks/{id}/result", auth.IsAuthorized(getResult.GetTaskResult(storage))).Methods("GET")
 	router.Handle("/operations", auth.IsAuthorized(getOperation.GetOperations)).Methods("GET")
 

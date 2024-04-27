@@ -40,9 +40,9 @@ func New(storagePath string) (*Storage, error) {
     CREATE TABLE IF NOT EXISTS Tasks (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         UserID INTEGER NOT NULL,
-        Expression TEXT NOT NULL,
+        Expr TEXT NOT NULL,
         Status TEXT NOT NULL,
-        Result REAL,
+        Res REAL,
         AgentID INTEGER,
         Duration REAL,
 		StartDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -108,7 +108,7 @@ func (s *Storage) Login(login string, password string) (int64, error) {
 
 func (s *Storage) SaveTask(userID int64, expression string) (int64, error) {
 	const op = "storage.sqlite.SaveTask"
-	stmt, err := s.db.Prepare("INSERT INTO Tasks (UserID, Expression, Status) VALUES (?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO Tasks (UserID, Expr, Status) VALUES (?, ?, ?)")
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
@@ -131,10 +131,10 @@ func (s *Storage) GetTaskFromDB(agentID int64) (*addTask.Task, error) {
 	const op = "storage.sqlite.GetTaskFromDB"
 	var task addTask.Task
 	// Выполняем запрос к базе данных для получения задачи со статусом "queued"
-	row := s.db.QueryRow("SELECT ID, Expression FROM Tasks WHERE Status = 'queued' LIMIT 1")
+	row := s.db.QueryRow("SELECT ID, Expr FROM Tasks WHERE Status = 'queued' or Status = 'doing calculations' LIMIT 1")
 
 	// Сканируем данные из строки результата в переменные
-	if err := row.Scan(&task.ID, task.Expression); err != nil {
+	if err := row.Scan(&task.ID, &task.Expression); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// Если нет ни одной задачи со статусом "queued", возвращаем nil
 			return nil, nil
@@ -155,7 +155,7 @@ func (s *Storage) GetTaskFromDB(agentID int64) (*addTask.Task, error) {
 func (s *Storage) UpdateTaskInDB(task *addTask.Task) error {
 	const op = "storage.sqlite.UpdateTaskInDB"
 	// Выполняем запрос к базе данных для обновления задачи
-	_, err := s.db.Exec("UPDATE Tasks SET Status=?, Result=?, Duration=?, AgentID=?, EndDate=? WHERE ID=?",
+	_, err := s.db.Exec("UPDATE Tasks SET Status=?, Res=?, Duration=?, AgentID=?, EndDate=? WHERE ID=?",
 		task.Status, task.Result, task.Duration, task.AgentID, time.Now(), task.ID)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -168,11 +168,40 @@ func (s *Storage) GetResult(taskID int) (*addTask.Task, error) {
 	const op = "storage.sqlite.GetResult"
 	var task addTask.Task
 
-	err := s.db.QueryRow("SELECT Status, Result FROM Tasks WHERE ID = ?",
+	err := s.db.QueryRow("SELECT Status, Res FROM Tasks WHERE ID = ?",
 		taskID).Scan(&task.Status, &task.Result)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &task, nil
+}
+
+func (s *Storage) GetTaskList() ([]*addTask.Task, error) {
+	const op = "storage.sqlite.GetTaskList"
+	rows, err := s.db.Query("SELECT ID, UserID, Expr, Status, AgentID FROM Tasks")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	fmt.Println(rows)
+	defer rows.Close()
+
+	// Создаем слайс для хранения всех задач
+	var tasks []*addTask.Task
+
+	// Итерируем по строкам результата и сканируем данные в структуру Task
+	for rows.Next() {
+		var task addTask.Task
+		if err := rows.Scan(&task.ID, &task.UserID, &task.Expression, &task.Status, &task.AgentID); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+		tasks = append(tasks, &task)
+	}
+
+	// Проверяем наличие ошибок при итерации по результатам запроса
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return tasks, nil
 }

@@ -13,6 +13,7 @@ tg: @Vzyhovich
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/3eaa9a3a-8e8e-44e6-b164-99727a3682f4)
 
 
+
 Хэндлер "/login": также, как и при регистриции надо отправить данные в JSON формате
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/36e68626-eea5-4dce-85a8-9b5008e36bb6)
 

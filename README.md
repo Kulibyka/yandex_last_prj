@@ -13,14 +13,14 @@ tg: @Vzyhovich
 
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/3eaa9a3a-8e8e-44e6-b164-99727a3682f4)
 
-
-
 Хэндлер "/login": также, как и при регистриции надо отправить данные в JSON формате
+
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/36e68626-eea5-4dce-85a8-9b5008e36bb6)
 
 
 При выполненной регистрации сервер в ответ пришлёт JWT токен. 
 
 Для теста всех остальных хэндлеров будет необходимо использовать полученный токен, выбираем Bearer token, и он либо автоматически подставиться, либо придётся это сделать вручную (так лучше, тк иногда он неправильно подставляет)
+
 ![image](https://github.com/Kulibyka/grpc_yandex/assets/59702274/f73f3d0d-7ed6-48a3-86ac-e5e8f3ebed4d)
 

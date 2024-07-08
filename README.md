@@ -1,4 +1,4 @@
-# grpc_yandex
+# yandex_last_prj
 tg: @Vzyhovich
 
 Данный проект представляет собой доработку прошлого.
